@@ -7,7 +7,7 @@ const menuItemSchema = new Schema ({
     },
     name: String,
     itemType: [{ type : String }],
-    itemImage: String
+    menuImages: [String]
 })
 const MenuItem = model('MenuItem', menuItemSchema)
 module.exports = MenuItem

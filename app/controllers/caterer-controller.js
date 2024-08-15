@@ -55,6 +55,8 @@ catererCtrl.catererItems = async(req,res) => {
         res.status(400).json(err.message)
     }
 },
+
+
 catererCtrl.catererByLocation = async(req, res) => {
     try{
         const {location} = req.params
@@ -91,6 +93,7 @@ catererCtrl.deleteCaterer = async(req,res) => {
         res.status(400).json(err)
     }
 }
+
 
 
 catererCtrl.getCatererById = async (req, res) => {
@@ -142,8 +145,15 @@ catererCtrl.getVerificationStatus = async (req, res) => {
 // Controller Method to get caterer by userId
 catererCtrl.getCatererByUserId = async (req, res) => {
     try {
-        const userId = req.user.id; 
-      const caterer = await Caterer.findOne({ userId: userId });
+        const userId = req.params.id; 
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is required' });
+          }
+        console.log(`Fetching caterer for user ID: ${userId}`);
+
+
+      const caterer = await Caterer.findOne({userId });
+      console.log(caterer)
         if (!caterer) {
             return res.status(404).json({ message: 'Caterer not found.' });
         }

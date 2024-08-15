@@ -12,6 +12,7 @@ const authenticateUser = (req,res,next)=>{
             role: tokenData.role
         }
         console.log(req.user)
+        console.log('Middleware - req.user:', req.user);
         next()
     }
     catch(err){

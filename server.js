@@ -2,6 +2,9 @@ require('dotenv').config()
 const express = require('express')
 const {checkSchema} = require('express-validator')
 const multer=require('multer')
+const path = require('path');
+const fs=require('fs')
+
 
 const cors = require('cors')
 const app = express()
@@ -13,12 +16,13 @@ const { authenticateUser, authorizeUser } = require('./app/middlewares/auth')
 const usersCtrl = require('./app/controllers/users-controllers')
 const catererCtrl = require('./app/controllers/caterer-controller')
 const serviceCtrl=require('./app/controllers/service-controller')
-const menuCtrl=require('./app/controllers/menuItem-controllers')
 const enquiryCtrl=require('./app/controllers/enquiry-controllers')
 const eventsCtrl=require('./app/controllers/events-controllers')
 const menuCartCtrl=require('./app/controllers/menuCart-controllers')
 const paymentsCtrl=require('./app/controllers/payment-controller')
 const { reviewsCtrl,ratingsCtrl}=require('./app/controllers/review-controller')
+const menuItemCtrl=require('./app/controllers/menuItem-controllers')
+
 
 const {userRegisterSchema, userLoginSchema} = require('./app/validations/user-validation')
 const catererValidationSchema = require('./app/validations/caterer-validation')
@@ -26,22 +30,41 @@ const  enquiryValidationSchema=require('./app/validations/enquiry-validation')
 const menuCartValidation=require('./app/validations/menuCart-validation')
 const paymentSchema=require('./app/validations/payment-validation')
 const reviewsSchema=require('./app/validations/review-validation')
-
+const menuItemValidation=require('./app/validations/menuItem-validation')
 
 const configureDB = require('./config/db')
 
 configureDB()
 
+const imgconfig = multer.diskStorage({
+  destination: (req, file, callback) => {
+      const dir = './uploads';
+      if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+      }
+      callback(null, dir);
+  },
+  filename: (req, file, callback) => {
+      callback(null, `image-${Date.now()}${path.extname(file.originalname)}`);
+  }
+});
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      return cb(null, './images');
-    },
-    filename: function (req, file, cb) {
-     return  cb(null, Date.now() + '-' + file.originalname);
-    }
-  })
-  const upload = multer({storage});
+const isImage = (req, file, callback) => {
+  if (file.mimetype.startsWith('image')) {
+      callback(null, true);
+  } else {
+      callback(new Error('Only images are allowed'));
+  }
+};
+
+const upload = multer({
+  storage: imgconfig,
+  fileFilter: isImage,
+  limits: { fileSize: 10000000 } // 10MB limit
+});
+
+
+
 
 
 app.use(cors())
@@ -67,19 +90,30 @@ app.put('/api/caterers/:id', checkSchema(catererValidationSchema), catererCtrl.u
 app.delete('/api/caterers/:id', checkSchema(catererValidationSchema), catererCtrl.deleteCaterer)
 app.post('/api/caterers/pending', authenticateUser, authorizeUser(['admin']), checkSchema(catererValidationSchema), catererCtrl.getPendingCaterers)
 app.get('/api/caterers/status/:id', authenticateUser, authorizeUser(['caterer']),checkSchema(catererValidationSchema), catererCtrl.getVerificationStatus)
+app.get('/api/caterers/users/:id',authenticateUser,authorizeUser(['caterer']),checkSchema(catererValidationSchema),catererCtrl.getCatererByUserId)
 
 
 
 //service
 app.post('/api/services',authenticateUser, authorizeUser(['caterer']),serviceCtrl.createService)
+app.get('/api/services/caterer/:id',authenticateUser, authorizeUser(['caterer']),serviceCtrl.getServicesByCatererId)
 app.get('/api/services',serviceCtrl.getAllServices)
-app.get('/api/services/:id',serviceCtrl.getAllServices)
+app.get('/api/services/:id',serviceCtrl.getServiceById)
+app.put('/api/services/:id',serviceCtrl.updateService)
+app.delete('/api/services/:id',serviceCtrl.deleteService)
 
 
 
 //menuItem
-app.post('/api/menuItem/upload', authenticateUser, authorizeUser(['caterer']), upload.single('itemImage'),menuCtrl.create)
-app.post('/api/menuItem/upload',upload.array('itemImage',4), menuCtrl.create)
+app.post('/api/menuItem/upload', authenticateUser, authorizeUser(['caterer']), upload.array('menuImages',10),menuItemCtrl.create)
+app.get('/api/menuItem/caterer/:id', authenticateUser, authorizeUser(['caterer']), menuItemCtrl.getMenuItemByCatererId);
+
+app.put('/api/menuItem/:id',checkSchema(menuItemValidation),menuItemCtrl.updateMenuItem)
+app.get('/api/menuItem/:id',checkSchema(menuItemValidation),menuItemCtrl.getMenuItem)
+app.get('/api/menuItem',checkSchema(menuItemValidation),menuItemCtrl.listMenuItem)
+app.delete('/api/menuItem/:id',checkSchema(menuItemValidation),menuItemCtrl.remove)
+
+
 
 
 //enquiry

@@ -12,6 +12,7 @@ serviceCtrl.createService = async (req, res) => {
     try {
         const catererId=req.user.id
         console.log(catererId)
+        console.log('Caterer ID:', catererId);
         const serviceData=req.body
     
         // Find the caterer by ID
@@ -23,7 +24,7 @@ serviceCtrl.createService = async (req, res) => {
         // Create the service with the caterer info
         const service = new Service({
           ...serviceData,
-          catererId: caterer._id
+        //   catererId: caterer._id
           
         });
     
@@ -53,15 +54,19 @@ serviceCtrl.getAllServices = async (req, res) => {
 // Get a service by ID
 serviceCtrl.getServiceById = async (req, res) => {
     try {
-        const service = await Service.findById(req.params.id).populate('catererId').populate('userId');
-        if (!service) {
+        const serviceId=req.params.id
+        console.log(serviceId)
+        
+        if (!serviceId) {
             return res.status(404).json({ error: 'Service not found' });
         }
-        res.status(200).json({service,caterer});
+        const service = await Service.findById(serviceId)
+        res.status(200).json({ service });
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 };
+
 
 // Update a service by ID
 serviceCtrl.updateService = async (req, res) => {
@@ -79,7 +84,8 @@ serviceCtrl.updateService = async (req, res) => {
 // Delete a service by ID
 serviceCtrl.deleteService = async (req, res) => {
     try {
-        const service = await Service.findByIdAndDelete(req.params.id);
+        const serviceId=req.params.id
+        const service = await Service.findByIdAndDelete(serviceId);
         if (!service) {
             return res.status(404).json({ error: 'Service not found' });
         }
@@ -88,5 +94,22 @@ serviceCtrl.deleteService = async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 };
+
+// service-controller.js
+
+serviceCtrl.getServicesByCatererId = async (req, res) => {
+    try {
+        const catererId=req.params.id
+      const services = await Service.find({ catererId });
+      if (!services) {
+        return res.status(404).json({ message: 'No services found' });  // Use return to stop further execution
+      }
+      res.json(services);  // Send response
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      res.status(500).json({ message: 'Error fetching services' });  // Send error response
+    }
+  };
+  
 
 module.exports=serviceCtrl
