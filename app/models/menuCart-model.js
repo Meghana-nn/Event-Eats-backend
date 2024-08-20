@@ -10,6 +10,24 @@ const menuCartSchema=new Schema({
         type: Schema.Types.ObjectId,
         ref: 'MenuItem'
     },
+    catererId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Caterer'
+      },
+      services: [
+        {
+          name: String,
+          description: String,
+          price: Number
+        }
+      ],
+      menuItems: [
+        {
+          name: String,
+          quantity: Number,
+          price: Number
+        }
+      ],
     userId :{
         type: Schema.Types.ObjectId,
         ref: 'User'

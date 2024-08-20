@@ -11,8 +11,8 @@ const authenticateUser = (req,res,next)=>{
             id: tokenData.id,
             role: tokenData.role
         }
-        console.log(req.user)
-        console.log('Middleware - req.user:', req.user);
+       
+        // console.log('Middleware - req.user:', req.user);
         next()
     }
     catch(err){
@@ -24,7 +24,7 @@ const authenticateUser = (req,res,next)=>{
 
 const authorizeUser = (role) => {
     return (req, res, next) => {
-            console.log('User role:', typeof(req.user.role))
+           
         if(role.includes((req.user.role).toString())){
             next()
         }else{

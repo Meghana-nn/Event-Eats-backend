@@ -145,7 +145,7 @@ catererCtrl.getVerificationStatus = async (req, res) => {
 // Controller Method to get caterer by userId
 catererCtrl.getCatererByUserId = async (req, res) => {
     try {
-        const userId = req.params.id; 
+        const userId = req.params.id
         if (!userId) {
             return res.status(400).json({ message: 'User ID is required' });
           }

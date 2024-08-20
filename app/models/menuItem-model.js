@@ -6,6 +6,7 @@ const menuItemSchema = new Schema ({
         ref: 'Caterer'
     },
     name: String,
+    amount:Number,
     itemType: [{ type : String }],
     menuImages: [String]
 })

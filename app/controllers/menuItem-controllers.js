@@ -8,12 +8,17 @@ menuItemCtrl.create = async (req, res) => {
     // Access uploaded files' URLs
     const fileUrls = req.files ? req.files.map(file => `${req.protocol}://${req.get('host')}/uploads/${file.filename}`) : [];
    
+    const { catererId, name, itemType,amount } = req.body;
+    if (!catererId) {
+      return res.status(400).json({ message: 'catererId is required' });
+    }
 
     // Create a new menu item
     const menuItem = new MenuItem({
-      catererId: req.user.id, // Ensure req.user.id is set correctly in your auth middleware
-      name: req.body.name,
-      itemType: req.body.itemType,
+      catererId, // Ensure req.user.id is set correctly in your auth middleware
+      name,
+      amount,
+      itemType,
       menuImages: fileUrls // Use the file URLs in the itemImages field
     });
 
@@ -46,7 +51,7 @@ menuItemCtrl.getMenuItem = async (req, res) => {
 
 menuItemCtrl.getMenuItemByCatererId = async (req, res) => {
   try {
-    const catererId = req.user.id;
+    const catererId = req.params.id;
     const menuItems = await MenuItem.find({ catererId });
     if (!menuItems) {
       return res.status(404).json({ error: 'Menu items not found' });

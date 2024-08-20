@@ -1,4 +1,5 @@
 require('dotenv').config()
+
 const express = require('express')
 const {checkSchema} = require('express-validator')
 const multer=require('multer')
@@ -90,13 +91,13 @@ app.put('/api/caterers/:id', checkSchema(catererValidationSchema), catererCtrl.u
 app.delete('/api/caterers/:id', checkSchema(catererValidationSchema), catererCtrl.deleteCaterer)
 app.post('/api/caterers/pending', authenticateUser, authorizeUser(['admin']), checkSchema(catererValidationSchema), catererCtrl.getPendingCaterers)
 app.get('/api/caterers/status/:id', authenticateUser, authorizeUser(['caterer']),checkSchema(catererValidationSchema), catererCtrl.getVerificationStatus)
-app.get('/api/caterers/users/:id',authenticateUser,authorizeUser(['caterer']),checkSchema(catererValidationSchema),catererCtrl.getCatererByUserId)
+app.get('/api/caterers/users/:id',checkSchema(catererValidationSchema),catererCtrl.getCatererByUserId)
 
 
 
 //service
 app.post('/api/services',authenticateUser, authorizeUser(['caterer']),serviceCtrl.createService)
-app.get('/api/services/caterer/:id',authenticateUser, authorizeUser(['caterer']),serviceCtrl.getServicesByCatererId)
+app.get('/api/services/caterer/:id',serviceCtrl.getServicesByCatererId)
 app.get('/api/services',serviceCtrl.getAllServices)
 app.get('/api/services/:id',serviceCtrl.getServiceById)
 app.put('/api/services/:id',serviceCtrl.updateService)
@@ -106,8 +107,7 @@ app.delete('/api/services/:id',serviceCtrl.deleteService)
 
 //menuItem
 app.post('/api/menuItem/upload', authenticateUser, authorizeUser(['caterer']), upload.array('menuImages',10),menuItemCtrl.create)
-app.get('/api/menuItem/caterer/:id', authenticateUser, authorizeUser(['caterer']), menuItemCtrl.getMenuItemByCatererId);
-
+app.get('/api/menuItem/caterer/:id', menuItemCtrl.getMenuItemByCatererId);
 app.put('/api/menuItem/:id',checkSchema(menuItemValidation),menuItemCtrl.updateMenuItem)
 app.get('/api/menuItem/:id',checkSchema(menuItemValidation),menuItemCtrl.getMenuItem)
 app.get('/api/menuItem',checkSchema(menuItemValidation),menuItemCtrl.listMenuItem)
@@ -129,10 +129,13 @@ app.put('/api/customers/response/:id',checkSchema(enquiryValidationSchema),enqui
 //event
 app.post('/api/events/:catererId', authenticateUser, authorizeUser(['customer']), eventsCtrl.create)
 app.get('/api/events',eventsCtrl.list)
+app.get('/api/events/:id',eventsCtrl.getEventById)
+app.get('/api/events/customer/:id', authenticateUser, authorizeUser(['customer']),eventsCtrl.getByCustomerId)
 
  //menu cart item
 app.post('/api/carts',authenticateUser,authorizeUser(['customer']),menuCartCtrl.create)
 app.get('/api/carts',menuCartCtrl.list)
+app.get('/api/carts/:id',checkSchema(menuCartValidation),menuCartCtrl.getById)
 app.put('/api/carts/:id',checkSchema(menuCartValidation),menuCartCtrl.update)
 app.delete('/api/carts/:id',checkSchema(menuCartValidation),menuCartCtrl.remove)
 

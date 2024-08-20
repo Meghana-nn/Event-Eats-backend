@@ -8,25 +8,35 @@ menuCartCtrl.create = async(req, res) => {
     if(!errors.isEmpty()){
         return res.status(400).json({errors:errors.array()})
     }
-    try{
-        const body = req.body
-        const userId= req.user.id
-        const menuCart = new MenuCart(body)
-        menuCart.save()
-        res.status(200).json(menuCart)
-    }
-    catch(err){
-        console.log(err)
-        res.status(500).json('Failed to Create Menu Item')
-    }
+    try {
+        const cartItem = new MenuCart(req.body);
+        await cartItem.save();
+        res.status(201).send(cartItem);
+      } catch (error) {
+        res.status(400).send(error);
+      }
 }
 
 
+menuCartCtrl.getById=async(req,res)=>{
+    try{
+        const cartItem=await MenuCart.findById(req.params.id)
+        if(!cartItem){
+            return res.status(400)
+        }
+        res.json(cartItem)
+
+    }
+    catch(err){
+        res.status(400).json({error:'couldnot get menu cart'})
+    }
+}
+
 menuCartCtrl.update=async(req,res)=>{
     try{
-        const {eventId,itemId,userId}=req.body
-        const updateItem=await MenuCart.findByIdAndUpdate({_id:id},{eventId,itemId,userId},{new:true})
-        if (!updatedItem) {
+      
+        const updateItem=await MenuCart.findByIdAndUpdate(req.params.id,{new:true,runValidators:true})
+        if (!updateItem) {
             return res.status(404).json({ message: 'MenuCart item not found' });
           }
       
