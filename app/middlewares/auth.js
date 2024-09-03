@@ -28,7 +28,7 @@ const authorizeUser = (role) => {
         if(role.includes((req.user.role).toString())){
             next()
         }else{
-            console.log(err)
+            console.log(error)
             res.status(403).json({error:'you are not authorize to access this route'})
         }
     }

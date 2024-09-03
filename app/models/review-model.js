@@ -7,7 +7,7 @@ const reviewSchema = new Schema({
     },
     catererId: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'Caterer'
     },
     rating: String,
     review: String

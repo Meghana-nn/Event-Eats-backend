@@ -13,7 +13,9 @@ const eventSchema=new Schema({
     },
     name: String, 
     startDate: Date,
+    startTime:String,
     endDate: Date,
+    endTime:String,
     noOfPeople: Number,
     address: {
         building: String,
@@ -31,8 +33,8 @@ const eventSchema=new Schema({
         coordinates: {
             type: [Number]
         }
-    },
-    amount: Number
+    }
+  
 }, { timestamps: true });
        
 const Event=model('Event',eventSchema)

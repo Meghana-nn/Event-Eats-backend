@@ -3,14 +3,16 @@ const {Schema,model}=mongoose
 const enquirySchema=new Schema({
     customerId :{
         type: Schema.Types.ObjectId,
-        ref: 'customer'
+        ref: 'User'
     },
-    catererid:{
+    catererId:{
         type: Schema.Types.ObjectId,
         ref: 'Caterer'
     },
     message :String,
-    response :String
+   responses:String,
+
+    
 },{timestamps:true})
 
 const Enquiry=model('Enquiry',enquirySchema)

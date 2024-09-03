@@ -72,4 +72,15 @@ try {
     }
 }
 
+usersCtrl.listCustomers = async (req, res) => {
+    try {
+        const customers = await User.find({ role: 'customer' }).select('username email'); 
+        res.json(customers);
+    } catch (err) {
+        res.status(500).json({ error: 'Something went wrong while fetching customers' });
+    }
+};
+
+
+
 module.exports = usersCtrl
